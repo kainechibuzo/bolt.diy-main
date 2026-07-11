@@ -2,7 +2,7 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 
-# CI-friendly env and aggressive V8 memory tuning for 512MB RAM
+# CI-friendly env, bypass husky hooks, and aggressive memory tuning for 512MB RAM
 ENV HUSKY=0
 ENV CI=true
 ENV NODE_ENV=production
@@ -18,9 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
 ARG VITE_PUBLIC_APP_URL
 ENV VITE_PUBLIC_APP_URL=${VITE_PUBLIC_APP_URL}
 
-# Copy package specs and install directly
+# Copy package specs and install directly (ignoring individual lifecycle script failures like husky)
 COPY package.json ./
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy source files
 COPY . .
