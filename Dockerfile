@@ -24,7 +24,7 @@ RUN pnpm fetch
 # Copy source and build
 COPY . .
 # install with dev deps (needed to build)
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install
 
 # Build the Remix app (SSR + client)
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
