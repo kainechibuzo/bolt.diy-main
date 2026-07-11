@@ -2,10 +2,9 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 
-# CI-friendly env, bypass husky hooks, and aggressive memory tuning for 512MB RAM
+# CI-friendly env (Do NOT set NODE_ENV=production here so devDependencies install)
 ENV HUSKY=0
 ENV CI=true
-ENV NODE_ENV=production
 
 # Use pnpm
 RUN corepack enable && corepack prepare pnpm@9.14.4 --activate
@@ -18,22 +17,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
 ARG VITE_PUBLIC_APP_URL
 ENV VITE_PUBLIC_APP_URL=${VITE_PUBLIC_APP_URL}
 
-# Copy package specs and install directly (ignoring individual lifecycle script failures like husky)
+# Copy package specs and install ALL dependencies needed to compile the project
 COPY package.json ./
 RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy source files
 COPY . .
 
-# Build the Remix app with extreme garbage collection flags for 512MB limit
-RUN NODE_OPTIONS="--max-old-space-size=384 --optimize-for-size --gc-interval=100" pnpm run build
+# Build the Remix app using only allowed NODE_OPTIONS flags
+RUN NODE_OPTIONS="--max-old-space-size=448" pnpm run build
 
 # ---- production dependencies stage ----
 FROM build AS prod-deps
+# Now strip away devDependencies safely for production sizing
+ENV NODE_ENV=production
 RUN pnpm prune --prod --ignore-scripts
 
 # ---- production stage ----
-FROM prod-deps AS bolt-ai-production
+FROM node:22-bookworm-slim AS bolt-ai-production
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -45,7 +46,7 @@ ENV RUNNING_IN_DOCKER=true
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
   && rm -rf /var/lib/apt/lists/*
 
-# Copy built files and pruned production dependencies
+# Copy built files and pruned production dependencies from prior stages
 COPY --from=prod-deps /app/build /app/build
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=prod-deps /app/package.json /app/package.json
