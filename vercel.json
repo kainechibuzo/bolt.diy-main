@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "app/entry.server.tsx": {
+      "runtime": "edge"
+    },
+    "build/server/index.js": {
+      "runtime": "edge"
+    }
+  }
+}
