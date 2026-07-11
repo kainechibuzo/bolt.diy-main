@@ -19,6 +19,13 @@ export default defineConfig((config) => {
     build: {
       target: 'esnext',
     },
+    server: {
+      host: true,
+      port: 5173,
+      allowedHosts: [
+        'bolt-diy-main-2jko.onrender.com'
+      ],
+    },
     plugins: [
       nodePolyfills({
         include: ['buffer', 'process', 'util', 'stream'],
