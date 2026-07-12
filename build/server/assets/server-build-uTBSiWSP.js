@@ -1,7 +1,7 @@
 import { jsxs, Fragment, jsx } from 'react/jsx-runtime';
 import { Meta, Links, Outlet, ScrollRestoration, Scripts, RemixServer, useLoaderData } from '@remix-run/react';
 import { isbot } from 'isbot';
-import { renderToReadableStream } from 'react-dom/server';
+import ReactServerDOM from 'react-dom/server.browser';
 import { createHead, renderHeadToString } from 'remix-island';
 import { useStore } from '@nanostores/react';
 import { map, atom, computed } from 'nanostores';
@@ -147,7 +147,7 @@ let debugLogger = null;
 const getDebugLogger = () => {
   if (!debugLogger && typeof window !== "undefined") {
     try {
-      import('./debugLogger-MFiPVFVm.js').then(({ debugLogger: loggerInstance }) => {
+      import('./debugLogger-D0G1MYY9.js').then(({ debugLogger: loggerInstance }) => {
         debugLogger = loggerInstance;
       }).catch(() => {
       });
@@ -669,7 +669,7 @@ function App() {
       userAgent: navigator.userAgent,
       timestamp: (/* @__PURE__ */ new Date()).toISOString()
     });
-    import('./debugLogger-MFiPVFVm.js').then(({ debugLogger }) => {
+    import('./debugLogger-D0G1MYY9.js').then(({ debugLogger }) => {
       const status = debugLogger.getStatus();
       logStore.logSystem("Debug logging ready", {
         initialized: status.initialized,
@@ -692,6 +692,7 @@ const route0 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const config = { runtime: "edge" };
+const { renderToReadableStream } = ReactServerDOM;
 async function handleRequest(request, responseStatusCode, responseHeaders, remixContext, _loadContext) {
   const readable = await renderToReadableStream(/* @__PURE__ */ jsx(RemixServer, { context: remixContext, url: request.url }), {
     signal: request.signal,

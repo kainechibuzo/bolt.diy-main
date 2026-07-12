@@ -1,8 +1,8 @@
-export { s as assets, a as assetsBuildDirectory, b as basename, e as entry, f as future, i as isSpaMode, m as mode, p as publicPath, r as routes } from './assets/server-build-DFvssXzn.js';
+export { s as assets, a as assetsBuildDirectory, b as basename, e as entry, f as future, i as isSpaMode, m as mode, p as publicPath, r as routes } from './assets/server-build-uTBSiWSP.js';
 import 'react/jsx-runtime';
 import '@remix-run/react';
 import 'isbot';
-import 'react-dom/server';
+import 'react-dom/server.browser';
 import 'remix-island';
 import '@nanostores/react';
 import 'nanostores';

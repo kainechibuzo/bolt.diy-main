@@ -1,8 +1,8 @@
-import { l as logger, D as DEFAULT_MODEL, P as PROVIDER_LIST } from './server-build-DFvssXzn.js';
+import { l as logger, D as DEFAULT_MODEL, P as PROVIDER_LIST } from './server-build-uTBSiWSP.js';
 import 'react/jsx-runtime';
 import '@remix-run/react';
 import 'isbot';
-import 'react-dom/server';
+import 'react-dom/server.browser';
 import 'remix-island';
 import '@nanostores/react';
 import 'nanostores';
@@ -66,7 +66,7 @@ let logStore = null;
 const getLogStore = () => {
   if (!logStore && typeof window !== "undefined") {
     try {
-      import('./server-build-DFvssXzn.js').then(n => n.c).then(({ logStore: store }) => {
+      import('./server-build-uTBSiWSP.js').then(n => n.c).then(({ logStore: store }) => {
         logStore = store;
       }).catch(() => {
       });
@@ -537,7 +537,7 @@ class DebugLogger {
       const store = getLogStore();
       if (!store) {
         try {
-          const { logStore: storeModule } = await import('./server-build-DFvssXzn.js').then(n => n.c);
+          const { logStore: storeModule } = await import('./server-build-uTBSiWSP.js').then(n => n.c);
           logStore = storeModule;
           return this._getLogStoreLogs();
         } catch {
