@@ -346,22 +346,43 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         ref={ref}
         className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
         data-chat-visible={showChat}
+        style={{
+          backgroundImage: !chatStarted 
+            ? 'linear-gradient(180deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, rgba(236, 72, 153, 0.15) 100%)'
+            : 'none',
+        }}
       >
         <ClientOnly>{() => <Menu />}</ClientOnly>
         <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
             {!chatStarted && (
-              <div id="intro" className="mt-[10vh] sm:mt-[16vh] max-w-2xl mx-auto text-center px-4 lg:px-0">
-                <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in leading-tight">
-                  Where ideas begin
-                </h1>
-                <p className="text-sm sm:text-base lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                  Bring ideas to life in seconds or get help on existing projects.
-                </p>
+              <div id="intro" className="flex-1 flex flex-col items-center justify-center gap-6 sm:gap-8 px-4 py-8 sm:py-12">
+                {/* Welcome Greeting */}
+                <div className="text-center">
+                  <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in leading-tight">
+                    Ready to build?
+                  </h1>
+                  <p className="text-sm sm:text-base lg:text-lg text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
+                    Bring ideas to life in seconds or get help on existing projects.
+                  </p>
+                </div>
+
+                {/* Integration Callout */}
+                <div className="w-full max-w-lg animate-fade-in animation-delay-300">
+                  <button className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-full bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor hover:border-bolt-elements-focus transition-colors">
+                    <div className="flex -space-x-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">G</div>
+                      <div className="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center text-white text-xs font-bold">S</div>
+                      <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold">G</div>
+                    </div>
+                    <span className="text-sm font-medium text-bolt-elements-textPrimary">Connect all your tools</span>
+                    <div className="i-ph:arrow-right text-bolt-elements-textSecondary ml-auto"></div>
+                  </button>
+                </div>
               </div>
             )}
             <StickToBottom
-              className={classNames('pt-4 sm:pt-6 px-2 sm:px-4 lg:px-6 relative', {
+              className={classNames('pt-0 sm:pt-0 px-2 sm:px-4 lg:px-6 relative', {
                 'h-full flex flex-col modern-scrollbar': chatStarted,
               })}
               resize="smooth"
