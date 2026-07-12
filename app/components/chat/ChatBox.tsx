@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { classNames } from '~/utils/classNames';
 import { PROVIDER_LIST } from '~/utils/constants';
@@ -20,6 +20,7 @@ import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { McpTools } from './MCPTools';
 import { WebSearch } from './WebSearch.client';
+import { ChatOptionsMenu } from './ChatOptionsMenu';
 
 interface ChatBoxProps {
   isModelSettingsCollapsed: boolean;
@@ -66,6 +67,8 @@ interface ChatBoxProps {
 }
 
 export const ChatBox: React.FC<ChatBoxProps> = (props) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div
       className={classNames(
@@ -261,26 +264,72 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           )}
         </ClientOnly>
         <div className="flex justify-between items-center text-sm p-3 sm:p-4 pt-2">
-          <div className="flex gap-1 items-center flex-wrap">
-            <IconButton title="Add" className="transition-all" onClick={() => props.handleFileUpload()}>
-              <div className="i-ph:plus text-lg"></div>
-            </IconButton>
-            {props.chatStarted && (
-              <IconButton
-                title="Build"
-                className={classNames(
-                  'transition-all flex items-center gap-1 px-2',
-                  props.chatMode === 'build'
-                    ? '!bg-bolt-elements-item-backgroundAccent !text-bolt-elements-item-contentAccent'
-                    : 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault',
-                )}
-                onClick={() => {
-                  props.setChatMode?.(props.chatMode === 'discuss' ? 'build' : 'discuss');
-                }}
-              >
-                <div className={`i-ph:hammer text-lg`} />
-              </IconButton>
-            )}
+          {/* Left side - Main controls */}
+          <div className="flex gap-1 items-center">
+            <ChatOptionsMenu
+              isOpen={menuOpen}
+              onToggle={setMenuOpen}
+              options={[
+                {
+                  id: 'upload',
+                  icon: 'i-ph:paperclip',
+                  title: 'Upload File',
+                  onClick: () => props.handleFileUpload(),
+                },
+                {
+                  id: 'enhance',
+                  icon: 'i-bolt:stars',
+                  title: 'Enhance Prompt',
+                  disabled: props.input.length === 0 || props.enhancingPrompt,
+                  onClick: () => {
+                    props.enhancePrompt?.();
+                    toast.success('Prompt enhanced!');
+                  },
+                },
+                {
+                  id: 'search',
+                  icon: 'i-ph:magnifying-glass',
+                  title: 'Web Search',
+                  disabled: props.isStreaming,
+                  onClick: () => {
+                    // Web search toggle
+                  },
+                },
+                ...(props.chatStarted
+                  ? [
+                      {
+                        id: 'discuss',
+                        icon: 'i-ph:chats',
+                        title: 'Discuss Mode',
+                        isActive: props.chatMode === 'discuss',
+                        onClick: () => {
+                          props.setChatMode?.(props.chatMode === 'discuss' ? 'build' : 'discuss');
+                        },
+                      },
+                    ]
+                  : []),
+                {
+                  id: 'model-settings',
+                  icon: `i-ph:caret-${props.isModelSettingsCollapsed ? 'right' : 'down'}`,
+                  title: 'Model Settings',
+                  disabled: !props.providerList || props.providerList.length === 0,
+                  isActive: props.isModelSettingsCollapsed,
+                  onClick: () => props.setIsModelSettingsCollapsed(!props.isModelSettingsCollapsed),
+                },
+                {
+                  id: 'color-scheme',
+                  icon: 'i-ph:palette',
+                  title: 'Design',
+                  onClick: () => {
+                    // Color scheme toggle
+                  },
+                },
+              ]}
+            />
+          </div>
+
+          {/* Center - Speech and primary actions */}
+          <div className="flex gap-2 items-center">
             <SpeechRecognitionButton
               isListening={props.isListening}
               onStart={props.startListening}
@@ -288,62 +337,15 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               disabled={props.isStreaming}
             />
           </div>
+
+          {/* Right side - Other elements */}
           <div className="flex gap-1 items-center">
             <ColorSchemeDialog designScheme={props.designScheme} setDesignScheme={props.setDesignScheme} />
             <McpTools />
-            <IconButton title="Upload file" className="transition-all hidden sm:flex" onClick={() => props.handleFileUpload()}>
-              <div className="i-ph:paperclip text-xl"></div>
-            </IconButton>
             <WebSearch onSearchResult={(result) => props.onWebSearchResult?.(result)} disabled={props.isStreaming} />
-            <IconButton
-              title="Enhance prompt"
-              disabled={props.input.length === 0 || props.enhancingPrompt}
-              className={classNames('transition-all hidden sm:flex', props.enhancingPrompt ? 'opacity-100' : '')}
-              onClick={() => {
-                props.enhancePrompt?.();
-                toast.success('Prompt enhanced!');
-              }}
-            >
-              {props.enhancingPrompt ? (
-                <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-xl animate-spin"></div>
-              ) : (
-                <div className="i-bolt:stars text-xl"></div>
-              )}
-            </IconButton>
-
-            {props.chatStarted && (
-              <IconButton
-                title="Discuss"
-                className={classNames(
-                  'transition-all flex items-center gap-1 px-1.5 hidden sm:flex',
-                  props.chatMode === 'discuss'
-                    ? '!bg-bolt-elements-item-backgroundAccent !text-bolt-elements-item-contentAccent'
-                    : 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault',
-                )}
-                onClick={() => {
-                  props.setChatMode?.(props.chatMode === 'discuss' ? 'build' : 'discuss');
-                }}
-              >
-                <div className={`i-ph:chats text-xl`} />
-              </IconButton>
-            )}
-            <IconButton
-              title="Model Settings"
-              className={classNames('transition-all flex items-center gap-1 hidden sm:flex', {
-                'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent':
-                  props.isModelSettingsCollapsed,
-                'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault':
-                  !props.isModelSettingsCollapsed,
-              })}
-              onClick={() => props.setIsModelSettingsCollapsed(!props.isModelSettingsCollapsed)}
-              disabled={!props.providerList || props.providerList.length === 0}
-            >
-              <div className={`i-ph:caret-${props.isModelSettingsCollapsed ? 'right' : 'down'} text-lg`} />
-              {props.isModelSettingsCollapsed ? <span className="text-xs">{props.model}</span> : <span />}
-            </IconButton>
+            <SupabaseConnection />
+            <ExpoQrModal open={props.qrModalOpen} onClose={() => props.setQrModalOpen(false)} />
           </div>
-          <SupabaseConnection />
-          <ExpoQrModal open={props.qrModalOpen} onClose={() => props.setQrModalOpen(false)} />
         </div>
       </div>
     </div>
