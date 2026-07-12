@@ -2,7 +2,7 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 
-# CI-friendly env (Do NOT set NODE_ENV=production here so devDependencies install)
+# CI-friendly settings (Keep NODE_ENV unset here so devDependencies install)
 ENV HUSKY=0
 ENV CI=true
 
@@ -17,19 +17,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
 ARG VITE_PUBLIC_APP_URL
 ENV VITE_PUBLIC_APP_URL=${VITE_PUBLIC_APP_URL}
 
-# Copy package specs and install ALL dependencies needed to compile the project
+# Copy package specs and install all dependencies needed to compile the project
 COPY package.json ./
 RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy source files
 COPY . .
 
-# Build the Remix app using only allowed NODE_OPTIONS flags
+# Build the Remix app using only the safe, standard memory allocation flag
 RUN NODE_OPTIONS="--max-old-space-size=448" pnpm run build
 
 # ---- production dependencies stage ----
 FROM build AS prod-deps
-# Now strip away devDependencies safely for production sizing
+# Strip away devDependencies safely for production sizing
 ENV NODE_ENV=production
 RUN pnpm prune --prod --ignore-scripts
 
