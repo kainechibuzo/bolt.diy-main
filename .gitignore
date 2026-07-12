@@ -24,7 +24,10 @@ dist-ssr
 
 /.history
 /.cache
-/build
+# NOTE: `build/` is intentionally NOT ignored. The production bundle is built
+# locally (pnpm run build) and committed so Render's Docker image can copy the
+# pre-compiled output instead of running the memory-heavy Vite build in-container.
+# /build
 functions/build/
 .env.local
 .env

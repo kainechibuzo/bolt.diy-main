@@ -19,8 +19,22 @@ README.md
 **/*.log
 **/node_modules
 **/dist
-**/build
 **/.cache
 logs
 dist-ssr
 .DS_Store
+
+# Ignore Electron / Wrangler / test artifacts not needed at runtime
+electron/
+.wrangler/
+.vercel/
+docs/
+tests/
+
+# NOTE: The `build/` directory is INTENTIONALLY NOT IGNORED.
+# The Dockerfile copies the pre-compiled `build/` output into the runtime
+# image instead of running `pnpm run build` inside the container.
+# Only ignore Cloudflare Pages functions build output:
+functions/build/
+!build
+!build/**
