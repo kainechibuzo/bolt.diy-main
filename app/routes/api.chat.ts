@@ -348,7 +348,15 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
       },
       onError: (error: any) => {
         // Provide more specific error messages for common issues
-        const errorMessage = error.message || 'Unknown error';
+        let errorMessage = 'Unknown error';
+
+        if (typeof error === 'string') {
+          errorMessage = error;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        } else if (error?.error?.message) {
+          errorMessage = error.error.message;
+        }
 
         if (errorMessage.includes('model') && errorMessage.includes('not found')) {
           return 'Custom error: Invalid model selected. Please check that the model name is correct and available.';
