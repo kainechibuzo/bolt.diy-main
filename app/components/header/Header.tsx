@@ -4,9 +4,15 @@ import { chatStore } from '~/lib/stores/chat';
 import { classNames } from '~/utils/classNames';
 import { HeaderActionButtons } from './HeaderActionButtons.client';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
+import { sidebarStore } from '~/lib/stores/sidebar';
 
 export function Header() {
   const chat = useStore(chatStore);
+  const sidebarOpen = useStore(sidebarStore);
+
+  const toggleSidebar = () => {
+    sidebarStore.set(!sidebarOpen);
+  };
 
   return (
     <header
@@ -15,14 +21,18 @@ export function Header() {
         'border-bolt-elements-borderColor': chat.started,
       })}
     >
-      <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
+      <button 
+        onClick={toggleSidebar}
+        className="flex items-center justify-center w-10 h-10 rounded-lg text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-2 transition-colors"
+        title="Toggle sidebar"
+      >
         <div className="i-ph:sidebar-simple-duotone text-xl" />
-        <a href="/" className="text-2xl font-semibold text-accent flex items-center">
-          {/* <span className="i-bolt:logo-text?mask w-[46px] inline-block" /> */}
-          <img src="/logo-light-styled.png" alt="logo" className="w-[90px] inline-block dark:hidden" />
-          <img src="/logo-dark-styled.png" alt="logo" className="w-[90px] inline-block hidden dark:block" />
-        </a>
-      </div>
+      </button>
+      <a href="/" className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary ml-2">
+        {/* <span className="i-bolt:logo-text?mask w-[46px] inline-block" /> */}
+        <img src="/logo-light-styled.png" alt="logo" className="w-[90px] inline-block dark:hidden" />
+        <img src="/logo-dark-styled.png" alt="logo" className="w-[90px] inline-block hidden dark:block" />
+      </a>
       {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.
         <>
           <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">

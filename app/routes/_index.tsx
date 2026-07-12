@@ -4,6 +4,7 @@ import { BaseChat } from '~/components/chat/BaseChat';
 import { Chat } from '~/components/chat/Chat.client';
 import { Header } from '~/components/header/Header';
 import BackgroundRays from '~/components/ui/BackgroundRays';
+import { Menu } from '~/components/sidebar/Menu.client';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Bolt' }, { name: 'description', content: 'Talk with Bolt, an AI assistant from StackBlitz' }];
@@ -19,10 +20,13 @@ export const loader = () => json({});
  */
 export default function Index() {
   return (
-    <div className="flex flex-col h-full w-full bg-bolt-elements-background-depth-1">
-      <BackgroundRays />
-      <Header />
-      <ClientOnly fallback={<BaseChat />}>{() => <Chat />}</ClientOnly>
+    <div className="flex h-full w-full bg-bolt-elements-background-depth-1">
+      <Menu />
+      <div className="flex flex-col flex-1 h-full w-full">
+        <BackgroundRays />
+        <Header />
+        <ClientOnly fallback={<BaseChat />}>{() => <Chat />}</ClientOnly>
+      </div>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
+import { sidebarStore } from '~/lib/stores/sidebar';
 
 const menuVariants = {
   closed: {
@@ -67,12 +68,18 @@ export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
-  const [open, setOpen] = useState(false);
+  const sidebarOpen = useStore(sidebarStore);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const profile = useStore(profileStore);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const setOpen = (value: boolean) => {
+    sidebarStore.set(value);
+  };
+
+  const open = sidebarOpen;
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
     items: list,
@@ -324,6 +331,13 @@ export const Menu = () => {
 
   return (
     <>
+      {/* Backdrop overlay */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40"
+          onClick={() => setOpen(false)}
+        />
+      )}
       <motion.div
         ref={menuRef}
         initial="closed"
@@ -334,7 +348,7 @@ export const Menu = () => {
           'flex selection-accent flex-col side-menu fixed top-0 h-full rounded-r-2xl',
           'bg-white dark:bg-gray-950 border-r border-bolt-elements-borderColor',
           'shadow-sm text-sm',
-          isSettingsOpen ? 'z-40' : 'z-sidebar',
+          isSettingsOpen ? 'z-50' : 'z-sidebar',
         )}
       >
         <div className="h-12 flex items-center justify-between px-4 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/50 rounded-tr-2xl">
